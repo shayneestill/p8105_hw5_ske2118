@@ -178,8 +178,25 @@ list(
 Now run prop.test for each of the cities in your dataset, and extract both the proportion of unsolved homicides and the confidence interval for each. Do this within a “tidy” pipeline, making use of purrr::map, purrr::map2, list columns and unnest as necessary to create a tidy dataframe with estimated proportions and CIs for each city.
 
 ```{r}
+results <- homicide_df_citystate |>
+  mutate(
+    prop_test = map2(unsolved_homicides, total_homicides, ~ prop.test(x = .x, n = .y, conf.level = 0.95)),
+    tidy_result = map(prop_test, broom::tidy) 
+  ) %>%
+  select(city_state, tidy_result) |>
+  unnest(tidy_result)
 
+final_results <- results |>
+  select(
+    city_state,
+    estimated_proportion = estimate, 
+    conf_lower = conf.low,           
+    conf_upper = conf.high          
+  )
+
+print(final_results)
 ```
 
 
 Create a plot that shows the estimates and CIs for each city – check out geom_errorbar for a way to add error bars based on the upper and lower limits. Organize cities according to the proportion of unsolved homicides.
+
