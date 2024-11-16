@@ -200,3 +200,20 @@ print(final_results)
 
 Create a plot that shows the estimates and CIs for each city – check out geom_errorbar for a way to add error bars based on the upper and lower limits. Organize cities according to the proportion of unsolved homicides.
 
+```{r}
+homicide_plot <- final_results |>
+  arrange(desc(estimated_proportion)) |>
+  mutate(city_state = factor(city_state, levels = city_state)) 
+
+ggplot(homicide_plot, aes(x = city_state, y = estimated_proportion)) +
+  geom_point(size = 3, color = "blue") +
+  geom_errorbar(aes(ymin = conf_lower, ymax = conf_upper), width = 0.3, color = "red") + 
+  coord_flip() + 
+  labs(
+    title = "Estimated Proportion of Unsolved Homicides by City",
+    x = "City",
+    y = "Estimated Proportion of Unsolved Homicides",
+  ) +
+  theme_minimal()
+```
+
